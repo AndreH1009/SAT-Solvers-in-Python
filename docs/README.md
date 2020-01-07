@@ -13,6 +13,7 @@ A SAT-formula is a list [f,a], where f is a list of clauses and a is a dictionar
 Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x₂ ∨ ¬x₄ ∨ ¬x₃ ) ∧ ( ¬x₂ ∨ ¬x₃ ∨ ¬x₄ )
 
 ## Example
+```
 input formula: 
 ( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₀ ) ∧ ( x₀ ∨ ¬x₃ ∨ ¬x₂ ) ∧ ( x₂ ∨ x₃ ∨ x₀ )
 -----SIMPLIFY--------------------------------
@@ -37,3 +38,4 @@ after reduction:
 current assignment:  {'x0': True, 'x1': False, 'x2': False, 'x3': True}
 -----END-------------------------------------
 derived empty formula!
+```
