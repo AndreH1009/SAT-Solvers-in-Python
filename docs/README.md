@@ -15,27 +15,28 @@ Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x�
 ## Example
 ```
 input formula: 
-( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₀ ) ∧ ( x₀ ∨ ¬x₃ ∨ ¬x₂ ) ∧ ( x₂ ∨ x₃ ∨ x₀ )
+( x₂ ∨ x₁ ∨ x₀ ) ∧ ( x₂ ∨ ¬x₁ ∨ x₀ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₃ ) ∧ ( ¬x₀ ∨ x₂ ∨ x₃ )
 -----SIMPLIFY--------------------------------
 -----starting round 1------------------------
 after reduction: 
-( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₀ ) ∧ ( x₀ ∨ ¬x₃ ∨ ¬x₂ ) ∧ ( x₂ ∨ x₃ ∨ x₀ )
+( x₂ ∨ x₁ ∨ x₀ ) ∧ ( x₂ ∨ ¬x₁ ∨ x₀ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₃ ) ∧ ( ¬x₀ ∨ x₂ ∨ x₃ )
 current assignment:  {'x0': None, 'x1': None, 'x2': None, 'x3': None}
 -----END-------------------------------------
 I will assign  x0 with  True
 -----SIMPLIFY--------------------------------
 -----starting round 1------------------------
 after reduction: 
-( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ )
+( ¬x₂ ∨ ¬x₁ ∨ ¬x₃ ) ∧ ( x₂ ∨ x₃ )
 current assignment:  {'x0': True, 'x1': None, 'x2': None, 'x3': None}
 -----starting round 2------------------------
 after reduction: 
-( ¬x₂ ∨ ¬x₁ )
-current assignment:  {'x0': True, 'x1': None, 'x2': None, 'x3': True}
+( x₂ ∨ x₃ )
+current assignment:  {'x0': True, 'x1': False, 'x2': None, 'x3': None}
 -----starting round 3------------------------
 after reduction: 
 []
-current assignment:  {'x0': True, 'x1': False, 'x2': False, 'x3': True}
+current assignment:  {'x0': True, 'x1': False, 'x2': True, 'x3': True}
 -----END-------------------------------------
-derived empty formula!
+found satisfying assignment!
+{'x0': True, 'x1': False, 'x2': True, 'x3': True}
 ```
