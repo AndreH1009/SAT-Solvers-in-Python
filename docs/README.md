@@ -11,3 +11,29 @@ A SAT-formula is a list [f,a], where f is a list of clauses and a is a dictionar
 
 - The function display_SAT takes a SAT-formula and displays it nicely by replacing list brackets by round parentheses and by adding the correct symbols for the operators of propositional logic.\
 Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x₂ ∨ ¬x₄ ∨ ¬x₃ ) ∧ ( ¬x₂ ∨ ¬x₃ ∨ ¬x₄ )
+
+## Example
+input formula: 
+( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₀ ) ∧ ( x₀ ∨ ¬x₃ ∨ ¬x₂ ) ∧ ( x₂ ∨ x₃ ∨ x₀ )
+-----SIMPLIFY--------------------------------
+-----starting round 1------------------------
+after reduction: 
+( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ ∨ ¬x₀ ) ∧ ( x₀ ∨ ¬x₃ ∨ ¬x₂ ) ∧ ( x₂ ∨ x₃ ∨ x₀ )
+current assignment:  {'x0': None, 'x1': None, 'x2': None, 'x3': None}
+-----END-------------------------------------
+I will assign  x0 with  True
+-----SIMPLIFY--------------------------------
+-----starting round 1------------------------
+after reduction: 
+( x₁ ∨ x₃ ∨ x₂ ) ∧ ( ¬x₂ ∨ ¬x₁ )
+current assignment:  {'x0': True, 'x1': None, 'x2': None, 'x3': None}
+-----starting round 2------------------------
+after reduction: 
+( ¬x₂ ∨ ¬x₁ )
+current assignment:  {'x0': True, 'x1': None, 'x2': None, 'x3': True}
+-----starting round 3------------------------
+after reduction: 
+[]
+current assignment:  {'x0': True, 'x1': False, 'x2': False, 'x3': True}
+-----END-------------------------------------
+derived empty formula!
