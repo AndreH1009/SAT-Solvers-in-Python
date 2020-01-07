@@ -12,6 +12,12 @@ A SAT-formula is a list [f,a], where f is a list of clauses and a is a dictionar
 - The function display_SAT takes a SAT-formula and displays it nicely by replacing list brackets by round parentheses and by adding the correct symbols for the operators of propositional logic.\
 Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x₂ ∨ ¬x₄ ∨ ¬x₃ ) ∧ ( ¬x₂ ∨ ¬x₃ ∨ ¬x₄ )
 
+## How To
+- clone the project
+- open sat_solvers.py
+- generate a SAT-formula "my_sat" using craft_SAT
+- print(solve_SAT(my_sat)) 
+
 ## Example
 ```
 input formula: 
