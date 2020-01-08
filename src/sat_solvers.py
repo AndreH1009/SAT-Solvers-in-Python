@@ -140,11 +140,12 @@ def assign(formula, literal, value):
         formula[1][literal] = value
 
 
-def simplify(formula):
+def simplify(formula, verbose=False):
     i = 0
     while True:
         i += 1
-        print('-----starting round %d------------------------' %i)
+        if verbose:
+            print('-----starting round %d------------------------' %i)
         token = cpy.deepcopy(formula)  # keep track of changes
         for literal in monochromes(formula):  # assign monochromatic literals such that they turn to True
             if 'n' in literal:
@@ -159,34 +160,41 @@ def simplify(formula):
                 assign(formula, unit, True)
         # delete redundant clauses and literals
         reduce_formula(formula)
-        print("after reduction: ")
-        display_SAT(formula)
-        print('current assignment: ', formula[1])
+        if verbose:
+            print("after reduction: ")
+            display_SAT(formula)
+            print('current assignment: ', formula[1])
         if token == formula or len(formula[0]) == 0:  # break when no change is achieved
             break
 
 
-def brute_force(formula):
+def brute_force(formula, verbose=False):
     copy = cpy.deepcopy(formula)
-    print("-----SIMPLIFY--------------------------------")
-    simplify(copy)
-    print("-----END-------------------------------------")
+    if verbose:
+        print("-----SIMPLIFY--------------------------------")
+    simplify(copy, verbose)
+    if verbose:
+        print("-----END-------------------------------------")
     # check if we can cut the current branch
     if len(copy[0]) == 0:
-        print("found satisfying assignment!")
+        if verbose:
+            print("found satisfying assignment!")
         return copy[1]
     if bottom(copy):
-        print("derived bottom!")
+        if verbose:
+            print("derived bottom!")
         return None
     # assign randomly to an arbitrary symbol
     # each branch has two chances, if both derive bottom cut off that branch
     symbol = get_blank_symbols(copy)[0]
-    print("I will assign ", symbol, "with ", True)
+    if verbose:
+        print("I will assign ", symbol, "with ", True)
     assign(copy, symbol, True)
     result = brute_force(copy)
     # print("my first try resulted in ", first_try)
     if result is None:
-        print("Backtrack: I will assign ", symbol, "with ", False)
+        if verbose:
+            print("Backtrack: I will assign ", symbol, "with ", False)
         assign(copy, symbol, False)
         result = brute_force(copy)
         # print("my last try resulted in ", last_try)
@@ -249,8 +257,9 @@ def display_SAT(formula):
     else:
         print(u' \u2227 '.join(nice_strings))
 
+##################################
 
-my_sat = craft_SAT(k=3, num_vars=4, clauses=4)
+my_sat = craft_SAT(k=3, num_vars=4, clauses=5)
 print("input formula: ")
 display_SAT(my_sat)
 print(solve_SAT(my_sat))
