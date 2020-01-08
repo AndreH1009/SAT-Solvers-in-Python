@@ -171,6 +171,8 @@ def simplify(formula, verbose=False):
 def brute_force(formula, verbose=False):
     copy = cpy.deepcopy(formula)
     if verbose:
+        print("input formula: ")
+        display_SAT(my_sat)
         print("-----SIMPLIFY--------------------------------")
     simplify(copy, verbose)
     if verbose:
@@ -260,7 +262,5 @@ def display_SAT(formula):
 ##################################
 
 my_sat = craft_SAT(k=3, num_vars=4, clauses=5)
-print("input formula: ")
-display_SAT(my_sat)
 print(solve_SAT(my_sat, verbose=True))
-# print(my_sat[1])
+
