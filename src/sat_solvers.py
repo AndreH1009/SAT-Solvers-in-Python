@@ -201,9 +201,9 @@ def brute_force(formula, verbose=False):
     return result
 
 
-def solve_SAT(formula, method='complete'):
+def solve_SAT(formula, method='complete', verbose=False):
     if method == 'complete':
-        return brute_force(formula)
+        return brute_force(formula, verbose)
     if method == 'incomplete':
         print("walk_sat not implemented yet!")
         return None
@@ -262,5 +262,5 @@ def display_SAT(formula):
 my_sat = craft_SAT(k=3, num_vars=4, clauses=5)
 print("input formula: ")
 display_SAT(my_sat)
-print(solve_SAT(my_sat))
+print(solve_SAT(my_sat, verbose=True))
 # print(my_sat[1])
