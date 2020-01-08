@@ -171,8 +171,6 @@ def simplify(formula, verbose=False):
 def brute_force(formula, verbose=False):
     copy = cpy.deepcopy(formula)
     if verbose:
-        print("input formula: ")
-        display_SAT(my_sat)
         print("-----SIMPLIFY--------------------------------")
     simplify(copy, verbose)
     if verbose:
@@ -204,6 +202,9 @@ def brute_force(formula, verbose=False):
 
 
 def solve_SAT(formula, method='complete', verbose=False):
+    if verbose:
+        print("input formula: ")
+        display_SAT(formula)
     if method == 'complete':
         return brute_force(formula, verbose)
     if method == 'incomplete':
