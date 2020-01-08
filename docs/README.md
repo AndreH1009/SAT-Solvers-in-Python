@@ -19,7 +19,7 @@ Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x�
 - display a given formula "my_sat":\
 ```display_SAT(my_sat)```
 - find and display a satisfying assignment if it exists:\
-```print(solve_cSAT(my_sat))```
+```print(solve_SAT(my_sat))```
 
 ## Example
 ```

@@ -253,5 +253,5 @@ def display_SAT(formula):
 my_sat = craft_SAT(k=3, num_vars=4, clauses=4)
 print("input formula: ")
 display_SAT(my_sat)
-print(solve_cSAT(my_sat))
+print(solve_SAT(my_sat))
 # print(my_sat[1])
