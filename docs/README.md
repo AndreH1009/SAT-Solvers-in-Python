@@ -13,10 +13,13 @@ A SAT-formula is a list [f,a], where f is a list of clauses and a is a dictionar
 Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x₂ ∨ ¬x₄ ∨ ¬x₃ ) ∧ ( ¬x₂ ∨ ¬x₃ ∨ ¬x₄ )
 
 ## How To
-- clone the project
-- open sat_solvers.py
-- generate a SAT-formula "my_sat" using craft_SAT
-- print(solve_SAT(my_sat)) 
+- clone the project and find file "sat_solvers.py" in src.
+- generate a SAT-formula with 3-clauses, 4 variables and 5 clauses:\
+```my_sat = craft_SAT(k=3, num_vars=4, clauses=5)```
+- display a given formula "my_sat":\
+```display_SAT(my_sat)```
+- find and display a satisfying assignment if it exists:\
+```print(solve_cSAT(my_sat))```
 
 ## Example
 ```
