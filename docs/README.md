@@ -20,6 +20,8 @@ Example: ( ¬x₃ ∨ x₄ ∨ x₂ ) ∧ ( x₂ ∨ x₀ ∨ x₃ ) ∧ ( ¬x�
 ```display_SAT(my_sat)```
 - find and display a satisfying assignment if it exists:\
 ```print(solve_SAT(my_sat))```
+- print the solving process:\
+```solve_SAT(my_sat, verbose=True)```
 
 ## Example
 ```
