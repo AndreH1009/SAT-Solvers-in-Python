@@ -4,6 +4,7 @@ import random
 import copy as cpy
 
 
+# return the negated literal
 def negate(literal):
     if 'n' in literal:
         return ''.join(list(literal)[1:])  # cut off the negation marker
@@ -11,13 +12,7 @@ def negate(literal):
         return 'n' + str(literal)
 
 
-def test_negate():
-    lit1 = ['nx1', None]
-    lit2 = ['x2', None]
-    print(lit1, lit2)
-    print(negate(lit1), negate(lit2))
-
-
+# evaluate the boolean value of a literal
 def eval_lit(literal, table):
     if 'n' in literal:
         if table[negate(literal)] is None:
@@ -31,34 +26,22 @@ def eval_lit(literal, table):
             return table[literal]
 
 
-def test_eval_lit():
-    lit = ['nx1', False]
-    lit2 = ['nx1', None]
-    print('test_eval_lit: ', eval_lit(lit) == True)
-
-
-def eval_clause(clause, table):  # clause is a list of tuples:(var, assignment)
+# evaluate the boolean value of a clause
+def eval_clause(clause, table):
     if len(clause) == 0:
         return False
     elif any([eval_lit(l, table) for l in clause]):
         return True
+    elif not any(map(lambda i: i is None, table.items())):
+        return False
     else:
         return None
 
 
-def test_eval_clause():
-    c = [['nx0', True], ['x1', None], ['x3', True]]
-    d = [['nx0', None], ['x1', None], ['x3', None]]
-    print('test_eval_clause: ', eval_clause(c) == True and eval_clause(d) == False)
-
-
+# evaluate the boolean value of a formula in CNF
 def eval_formula(formula):
-    return all(map(eval_clause, formula[0], formula[1]))
-
-
-def test_eval_formula():
-    f = [[['nx0', None], ['x1', False], ['x3', True]]]
-    print('test_eval_formula: ', eval_formula(f) == True)
+    # return all(map(eval_clause, formula[0], formula[1]))
+    return all(map(lambda c, d=formula[1]: eval_clause(c, d), formula[0]))
 
 
 # return True if bottom is derived under current assignment,
@@ -67,7 +50,8 @@ def bottom(formula):
     return any(map(lambda c: len(c) == 0, formula[0]))
 
 
-def reduce_clause(clause, table):  # delete any literal in a clause that evaluates to False
+# delete any literal in a clause that evaluates to False
+def reduce_clause(clause, table):
     marked = []
     for literal in clause:
         if eval_lit(literal, table) == False:
@@ -75,6 +59,7 @@ def reduce_clause(clause, table):  # delete any literal in a clause that evaluat
     clause[:] = [literal for literal in clause if clause.index(literal) not in marked]
 
 
+# delete clauses evaluating to True and literals evaluating to False
 def reduce_formula(formula):
     marked = []
     for clause in formula[0]:
@@ -85,6 +70,7 @@ def reduce_formula(formula):
     formula[0][:] = [clause for clause in formula[0] if formula[0].index(clause) not in marked]
 
 
+# return list of all unassigned-to variables
 def get_blank_symbols(formula):  # find symbols that haven't been assigned to yet
     blanks = []
     for symbol in formula[1].keys():
@@ -93,7 +79,8 @@ def get_blank_symbols(formula):  # find symbols that haven't been assigned to ye
     return blanks
 
 
-def monochromes(formula):  # find literals that strictly appear in either negated or non-negated form
+# return list of literals that strictly appear in either negated or non-negated form
+def monochromes(formula):
     checked = []
     monos = []
     for blank in get_blank_symbols(formula):
@@ -107,25 +94,12 @@ def monochromes(formula):  # find literals that strictly appear in either negate
             checked.append(negate(blank))
         else:
             checked.extend([blank, negate(blank)])
-
     # print("monochrome literals: ", list(map(parse_literal, monos)))
     return monos
 
 
-def test_monos(iterations=1000):
-    results = []
-    for i in range(iterations):
-        sat = craft_SAT(3)
-        monos = monochromes(sat)
-        if len(monos) != 0:
-            literal = random.choice(monos)
-            results.append(all(map(lambda c, l=literal: negate(l) not in c, sat)))
-        else:
-            continue
-    return all(results)
-
-
-def unit_literals(formula):  # return a list of all literals appearing in unit clauses
+# return a list of all literals appearing in unit clauses
+def unit_literals(formula):
     units = []
     for clause in formula[0]:
         if len(clause) == 1:
@@ -133,6 +107,7 @@ def unit_literals(formula):  # return a list of all literals appearing in unit c
     return units
 
 
+# for a given literal assign value to the corresponding variable
 def assign(formula, literal, value):
     if 'n' in literal:  # update dictionary
         formula[1][negate(literal)] = value
@@ -140,6 +115,7 @@ def assign(formula, literal, value):
         formula[1][literal] = value
 
 
+# perform trivial assignments and reduce the given formula
 def simplify(formula, verbose=False):
     i = 0
     while True:
@@ -168,7 +144,8 @@ def simplify(formula, verbose=False):
             break
 
 
-def brute_force(formula, verbose=False):
+# search the whole domain of possible assignments by performing recursive tree-search
+def solve_complete(formula, verbose=False):
     copy = cpy.deepcopy(formula)
     if verbose:
         print("-----SIMPLIFY--------------------------------")
@@ -190,32 +167,146 @@ def brute_force(formula, verbose=False):
     if verbose:
         print("I will assign ", symbol, "with ", True)
     assign(copy, symbol, True)
-    result = brute_force(copy)
+    result = solve_complete(copy)
     # print("my first try resulted in ", first_try)
     if result is None:
         if verbose:
             print("Backtrack: I will assign ", symbol, "with ", False)
         assign(copy, symbol, False)
-        result = brute_force(copy)
+        result = solve_complete(copy)
         # print("my last try resulted in ", last_try)
     return result
 
 
-def solve_SAT(formula, method='complete', verbose=False):
+# for a given literal negate the boolean value of the corresponding variable
+def flip_literal(table, literal):
+    if 'n' in literal:
+        table[negate(literal)] = not table[negate(literal)]
+    else:
+        table[literal] = not table[literal]
+
+
+# return the index of an arbitrary unsatisfied clause in formula
+def get_unsat_clause_index(formula):
+    for clause in formula[0]:
+        if eval_clause(clause, formula[1]):
+            continue
+        else:
+            return formula[0].index(clause)
+
+
+# search for a literal that can be flipped without unsatisfying another clause
+# if none was found return None
+def get_best_lit(formula, clause_index):
+    # print("clause index:", clause_index)
+    # generate lookup-table for boolean values of each clause
+    clause_vals = dict.fromkeys(range(len(formula[0])))
+    for clause in clause_vals:
+        clause_vals[clause] = eval_clause(formula[0][clause], formula[1])
+    # print("satisfied clauses: ", clause_vals)
+    # check each literal in given clause for it being flippable without unsatisfying other clauses
+    for literal in formula[0][clause_index]:
+        clause_vals_copy = cpy.deepcopy(clause_vals)  # copy of clause values
+        assignments_copy = cpy.deepcopy(formula[1])  # copy of variable assignments
+        flip_literal(assignments_copy, literal)  # flip the literal
+        for clause in clause_vals_copy:  # evaluate all clauses after flipping the literal
+            clause_vals_copy[clause] = eval_clause(formula[0][clause], assignments_copy)
+        # check if literal has the desired property:
+        if not any(map(lambda c: clause_vals[c] and not clause_vals_copy[c], clause_vals.keys())):
+            # print("best-lit: ", literal)
+            return literal
+    return None
+
+
+# count the number of clauses that get unsatisfied as a result of flipping the literal
+def count_unsat_clauses(formula, literal):
+    counter = 0
+    # generate lookup-table for boolean values of each clause
+    clause_vals = dict.fromkeys(range(len(formula[0])))
+    for clause in clause_vals:
+        clause_vals[clause] = eval_clause(formula[0][clause], formula[1])
+    clause_vals_copy = cpy.deepcopy(clause_vals)  # copy of clause values
+    assignments_copy = cpy.deepcopy(formula[1])  # copy of variable values
+    flip_literal(assignments_copy, literal)  # flip the literal
+    for clause in clause_vals_copy:  # evaluate all clauses after flipping the literal
+        clause_vals_copy[clause] = eval_clause(formula[0][clause], assignments_copy)
+    # count the number of dissatisfied clauses as a result of flipping literal
+    for clause in clause_vals_copy:
+        if not clause_vals_copy[clause] and clause_vals[clause]:  # check whether clause was True before and now False
+            counter += 1
+    return counter
+
+
+# attempt to solve formula using a random walk
+# number of coin tosses limited to tc, then restart on a random assignment
+# algorithm starts at most tr times, then outputs None
+def walk_sat(formula, tc=4, tr=4, bias=0.6, verbose=False):
+    restarts = 0
+    while not eval_formula(formula) and restarts < tr:
+        restarts += 1
+        if verbose:
+            print("restarting counter: ", restarts)
+        tosses = 0
+        # generate random assignment:
+        for key in formula[1]:
+            formula[1][key] = bool(random.randint(0, 1))
+        if verbose:
+            print("randomly generated assignment: ", formula[1])
+        while not eval_formula(formula) and tosses < tc:
+            # pick arbitrary unsatisfied clause:
+            clause = get_unsat_clause_index(formula)
+            if verbose:
+                print("clause ", formula[0][clause], "is not satisfied.")
+            # if there exists a literal in clause that can be flipped without dissatisfying any other clause then flip
+            best_lit = get_best_lit(formula, clause)
+            if best_lit is not None:
+                flip_literal(formula[1], best_lit)
+                if verbose:
+                    print("flipped literal ", best_lit)
+                    print("new assignment: ", formula[1])
+            else:
+                # else toss a coin and perform action according to outcome
+                coin = random.random() < bias
+                tosses += 1
+                if verbose:
+                    print("tossed a coin with result ", coin, ", counter ", tosses)
+                if coin:
+                    # flip literal such that the least number of other clauses gets unsatisfied
+                    if verbose:
+                        print("flipped literal such that the least number of clauses get unsatisfied.")
+                    counts = dict.fromkeys([l for l in formula[0][clause]])
+                    for literal in counts.keys():
+                        counts[literal] = count_unsat_clauses(formula, literal)
+                    flip_literal(formula[1], min(counts, key=counts.get))
+                else:
+                    # flip random literal
+                    if verbose:
+                        print("flipped a random literal.")
+                    flip_literal(formula[1], random.choice(formula[0][clause]))
+    if verbose:
+        if eval_formula(formula):
+            print("assignment ", formula[1], "is satisfying.")
+        else:
+            print("no satisfying assignment found.")
+    return formula[1] if eval_formula(formula) else None
+
+
+def solve_SAT(formula, method='complete', tosses=4, restarts=4, coin_bias=0.6, verbose=False):
     if verbose:
         print("input formula: ")
         display_SAT(formula)
     if method == 'complete':
-        return brute_force(formula, verbose)
+        return solve_complete(formula, verbose=verbose)
     if method == 'incomplete':
-        print("walk_sat not implemented yet!")
-        return None
+        return walk_sat(formula, tr=restarts, tc=tosses, bias=coin_bias, verbose=verbose)
     else:
         print("specify a valid method name!")
         return None
 
 
-def craft_SAT(k, num_vars=4, clauses=12):  # randomly generate a SAT-formula
+# randomly generate a SAT-formula in CNF
+# 'k' literals per clause, 'num_vars' variables in total, and 'clauses' number of clauses
+def craft_SAT(k, num_vars=4, clauses=12):
     formula = []
     variables = []
     for i in range(num_vars):  # generate symbols
@@ -235,6 +326,7 @@ def craft_SAT(k, num_vars=4, clauses=12):  # randomly generate a SAT-formula
     return [formula, assignment]
 
 
+# rewrite the given literal using lowercase numbers and symbols of propositional logic
 def parse_literal(literal):
     SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
     if 'n' in literal:
@@ -244,6 +336,7 @@ def parse_literal(literal):
     return parsed
 
 
+# rewrite the given clause using symbols of propositional logic and round parentheses
 def parse_clause(clause):
     nice_strings = []
     for piece in map(lambda l: parse_literal(l), clause):
@@ -251,6 +344,7 @@ def parse_clause(clause):
     return '( ' + u' \u2228 '.join(nice_strings) + ' )'
 
 
+# display the given formula using symbols of propositional logic and round parentheses
 def display_SAT(formula):
     nice_strings = []
     for nice_clause in map(parse_clause, formula[0]):
@@ -262,6 +356,6 @@ def display_SAT(formula):
 
 ##################################
 
-my_sat = craft_SAT(k=3, num_vars=4, clauses=5)
-print(solve_SAT(my_sat, verbose=True))
+# my_sat = craft_SAT(k=3, num_vars=4, clauses=5)
+# solve_SAT(my_sat, method='incomplete', verbose=True)
 
