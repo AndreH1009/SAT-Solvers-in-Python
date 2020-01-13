@@ -21,10 +21,10 @@ clone the project and find file "sat_solvers.py" in src.
 ```my_sat = craft_SAT(k=3, num_vars=4, clauses=5)```
 - display a given formula "my_sat":\
 ```display_SAT(my_sat)```
-- solve formula my_sat using complete solver solve_complete:\
+- solve formula my_sat using solve_complete:\
 ```print(solve_SAT(my_sat, method='complete))```
-- solve formula my_sat using incomplete solver walk_sat:\
-```print(solve_SAT(my_sat, method='complete))```
+- solve formula my_sat using walk_sat:\
+```print(solve_SAT(my_sat, method='incomplete))```
 - print the solving process:\
 ```solve_SAT(my_sat, verbose=True)```
 
